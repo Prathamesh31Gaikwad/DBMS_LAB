@@ -1,0 +1,58 @@
+CREATE DATABASE IF NOT EXISTS library_db;
+USE library_db;
+
+CREATE TABLE author (
+    authorId INT PRIMARY KEY auto_increment,
+    name VARCHAR(50) NOT NULL,
+    nationality VARCHAR(20)
+);
+
+CREATE TABLE book (
+    bookId INT PRIMARY KEY,
+    title VARCHAR(50) NOT NULL UNIQUE,
+    publication VARCHAR(50),
+    lang VARCHAR(20) NOT NULL,
+    authorId INT,
+    FOREIGN KEY (authorId) REFERENCES author(authorId) ON DELETE SET NULL
+);
+
+CREATE VIEW author_books AS
+SELECT b.title, a.name AS author_name
+FROM book b
+JOIN author a ON b.authorId = a.authorId;
+
+CREATE INDEX idx_lang ON book(lang);
+
+INSERT INTO author (name, nationality)
+VALUES ('Agatha Christie', 'English'), ('J.K. Rowling', 'British');
+
+INSERT INTO book (bookId, title, publication, lang, authorId)
+VALUES 
+    (1, 'Murder on the Orient Express', 'HarperCollins', 'English', 1), 
+    (2, 'Harry Potter and the Sorcerers Stone', 'Bloomsbury', 'English', 2);
+
+
+SELECT * FROM book;
+
+SELECT * FROM author_books;
+
+SELECT title FROM book
+WHERE authorId = (SELECT authorId FROM author WHERE name = 'Agatha Christie');
+
+SELECT lang, COUNT(*) AS book_count FROM book GROUP BY lang;
+
+SELECT * FROM author ORDER BY name DESC;
+
+SELECT title FROM book WHERE lang = 'English';
+
+UPDATE book SET lang = 'French' WHERE title = 'Harry Potter and the Sorcerer''s Stone';
+
+DELETE FROM book WHERE publication = 'Penguin Books';
+
+EXPLAIN SELECT * FROM book WHERE lang = 'English';
+
+SELECT lang, COUNT(*) AS book_count FROM book
+GROUP BY lang
+HAVING book_count > 1;
+
+
